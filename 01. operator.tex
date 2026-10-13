@@ -1,0 +1,1321 @@
+% =====================================================================
+% Basic MATLAB — Operator
+% Penulis : Andreas Syaloom Kurniawan
+% Compile : xelatex operator_matlab.tex
+% =====================================================================
+\documentclass[t,aspectratio=169,11pt]{beamer}
+\usetheme[progressbar=frametitle,numbering=fraction]{metropolis}
+
+\usepackage{fontspec}
+\setsansfont{DejaVu Sans}
+\setmonofont[Scale=0.88]{DejaVu Sans Mono}
+
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+\definecolor{mlorange}{HTML}{D95319}
+\definecolor{mlblue}{HTML}{0072BD}
+\definecolor{mlgreen}{HTML}{2E7D32}
+\definecolor{mlgray}{HTML}{6B6B6B}
+\definecolor{codebg}{HTML}{F4F4F1}
+
+\setbeamercolor{alerted text}{fg=mlorange}
+\setbeamercolor{progress bar}{fg=mlorange}
+
+\lstset{
+  language=Matlab,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{mlblue}\bfseries,
+  commentstyle=\color{mlgreen},
+  stringstyle=\color{mlorange},
+  backgroundcolor=\color{codebg},
+  frame=single, rulecolor=\color{codebg},
+  framesep=4pt, xleftmargin=4pt, xrightmargin=4pt,
+  columns=fullflexible, keepspaces=true,
+  showstringspaces=false, upquote=true,
+  aboveskip=4pt, belowskip=4pt
+}
+\newcommand{\cc}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\bsl}{\texttt{\textbackslash}}
+
+\title{Basic MATLAB: Operator}
+\subtitle{Aritmetika, Relasional, Logika, dan Operator Lain}
+\author{Andreas Syaloom Kurniawan}
+\institute{Fakultas Ekonomi dan Bisnis, Universitas Gadjah Mada}
+\date{Oktober 2026}
+
+\begin{document}
+
+\maketitle
+
+% =====================================================================
+\section{Operator Aritmetika}
+% =====================================================================
+
+\newcommand{\sub}[1]{{\large\textbf{\textcolor{mlorange}{#1}}}\par\vspace{6pt}}
+
+\begin{frame}{Operator Aritmetika}
+\sub{Apa itu operator aritmetika?}
+Simbol untuk operasi hitung. Kita mulai dari \alert{angka tunggal} (skalar), misalnya \cc{a = 6} dan \cc{b = 2}.
+
+\vspace{8pt}
+\centering
+\begin{tabular}{llll}
+\toprule
+Operator & Arti & Contoh & Hasil \\
+\midrule
+\cc{+} & tambah  & \cc{a + b} & 8 \\
+\cc{-} & kurang  & \cc{a - b} & 4 \\
+\cc{*} & kali    & \cc{a * b} & 12 \\
+\cc{/} & bagi    & \cc{a / b} & 3 \\
+\cc{^} & pangkat & \cc{a ^ b} & 36 \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Mencoba di Command Window}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{lstlisting}
+>> a = 6;
+>> b = 2;
+>> a + b
+ans =
+     8
+>> c = a * b
+c =
+    12
+\end{lstlisting}
+\column{0.44\textwidth}
+\small
+\begin{itemize}
+\item \cc{=} menyimpan nilai ke variabel (\cc{a} berisi 6).
+\item \cc{;} di akhir baris: hasil \alert{tidak ditampilkan}.
+\item Tanpa \cc{;}: hasil langsung tampil.
+\item Hasil tanpa nama variabel otomatis disimpan di \cc{ans}.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Pembagian: bagi kanan \cc{/} dan bagi kiri \bsl}
+MATLAB punya \alert{dua} operator bagi. Bedanya: angka mana yang menjadi pembagi.
+
+\vspace{6pt}
+\begin{columns}[T]
+\column{0.46\textwidth}
+\textbf{\textcolor{mlblue}{Bagi kanan} \cc{/}} (yang biasa)
+\begin{lstlisting}
+>> 6 / 2
+ans =
+     3
+\end{lstlisting}
+\small dibaca: 6 dibagi 2 \quad ($6 \div 2$)
+\column{0.46\textwidth}
+\textbf{\textcolor{mlorange}{Bagi kiri} \bsl}
+\begin{lstlisting}
+>> 6 \ 2
+ans =
+    0.3333
+\end{lstlisting}
+\small dibaca: 2 dibagi 6 \quad ($2 \div 6$)
+\end{columns}
+
+\vspace{8pt}
+\small Cara ingat: ujung atas garis miring selalu condong ke \alert{pembagi}.
+\cc{6/2} condong ke 2; \cc{6}\bsl\cc{2} condong ke 6.
+Untuk angka tunggal pakai \cc{/} saja; kegunaan \bsl{} baru terasa di matriks.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Dari angka tunggal ke matriks}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{lstlisting}
+>> A = [1 2; 3 4]
+A =
+     1     2
+     3     4
+\end{lstlisting}
+\small
+\begin{itemize}
+\item \cc{[ ]} membuat matriks.
+\item Spasi (atau koma) memisahkan \alert{kolom}.
+\item Titik koma \cc{;} memisahkan \alert{baris}.
+\end{itemize}
+\column{0.44\textwidth}
+Dalam notasi matematika:
+\[
+A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}
+\qquad
+B = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix}
+\]
+\small \cc{A} berukuran $2 \times 2$: 2 baris, 2 kolom.\\
+\cc{B = [5 6; 7 8]} dibuat dengan cara yang sama.
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Tambah dan kurang pada matriks}
+Tambah dan kurang selalu dihitung \alert{per posisi} (elemen dengan elemen).
+
+\begin{columns}[T]
+\column{0.46\textwidth}
+\begin{lstlisting}
+>> A + B
+ans =
+     6     8
+    10    12
+
+>> A + 10   % skalar ke semua elemen
+ans =
+    11    12
+    13    14
+\end{lstlisting}
+\column{0.48\textwidth}
+\[
+A + B =
+\begin{bmatrix} 1+5 & 2+6 \\ 3+7 & 4+8 \end{bmatrix}
+=
+\begin{bmatrix} 6 & 8 \\ 10 & 12 \end{bmatrix}
+\]
+\small Syarat: ukuran \cc{A} dan \cc{B} sama, atau salah satunya angka tunggal.
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Perkalian: \cc{*} (matriks) vs \cc{.*} (per elemen)}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{\cc{A * B}: perkalian matriks}\\[2pt]
+\small baris \cc{A} $\times$ kolom \cc{B}, lalu dijumlah
+\[
+\begin{bmatrix} 1{\cdot}5+2{\cdot}7 & 1{\cdot}6+2{\cdot}8 \\ 3{\cdot}5+4{\cdot}7 & 3{\cdot}6+4{\cdot}8 \end{bmatrix}
+= \begin{bmatrix} 19 & 22 \\ 43 & 50 \end{bmatrix}
+\]
+Syarat: jumlah kolom \cc{A} = jumlah baris \cc{B}.
+\column{0.48\textwidth}
+\textbf{\cc{A .* B}: per elemen}\\[2pt]
+\small posisi yang sama dikalikan
+\[
+\begin{bmatrix} 1{\cdot}5 & 2{\cdot}6 \\ 3{\cdot}7 & 4{\cdot}8 \end{bmatrix}
+= \begin{bmatrix} 5 & 12 \\ 21 & 32 \end{bmatrix}
+\]
+Syarat: ukuran sama (atau salah satunya skalar).
+\end{columns}
+
+\vspace{8pt}
+\small Titik (\cc{.}) di depan operator artinya \alert{hitung per elemen}. Untuk angka tunggal, \cc{*} dan \cc{.*} hasilnya sama.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Pangkat: \cc{^} (matriks) vs \cc{.^} (per elemen)}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{\cc{A ^ 2}} sama dengan \cc{A * A}
+\[
+\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}
+\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}
+= \begin{bmatrix} 7 & 10 \\ 15 & 22 \end{bmatrix}
+\]
+\small Hanya untuk matriks persegi.
+\column{0.48\textwidth}
+\textbf{\cc{A .^ 2}} tiap elemen dikuadratkan
+\[
+\begin{bmatrix} 1^2 & 2^2 \\ 3^2 & 4^2 \end{bmatrix}
+= \begin{bmatrix} 1 & 4 \\ 9 & 16 \end{bmatrix}
+\]
+\small Ini yang biasanya dimaksud saat mengolah data.
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Bagi kanan dan bagi kiri pada matriks}
+\small Sistem persamaan $2x + y = 3$ dan $x + 3y = 5$ dapat ditulis $A\mathbf{x} = \mathbf{b}$.
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{\textcolor{mlorange}{Bagi kiri}}\\[2pt]\small \cc{x = A}\bsl\cc{b} menyelesaikan \cc{A*x = b}
+\begin{lstlisting}
+>> A = [2 1; 1 3];
+>> b = [3; 5];
+>> x = A \ b
+x =
+    0.8000
+    1.4000
+\end{lstlisting}
+\column{0.48\textwidth}
+\textbf{\textcolor{mlblue}{Bagi kanan}}\\[2pt]\small \cc{x = b/A} menyelesaikan \cc{x*A = b}\\
+\small (versi baris dari kasus di kiri)
+\begin{lstlisting}
+>> [3 5] / A
+ans =
+    0.8000    1.4000
+\end{lstlisting}
+\small Versi per elemen:\\
+\cc{[2 4 6] ./ 2} $\to$ \cc{[1 2 3]}\\
+\cc{[2 4 6] .}\bsl\cc{ 2} $\to$ \cc{[1 0.5 0.3333]}
+\end{columns}
+
+\vspace{4pt}
+\small Pakai \cc{A}\bsl\cc{b}, bukan \cc{inv(A)*b}: lebih cepat dan lebih akurat.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Transpose \cc{'}: baris jadi kolom, kolom jadi baris}
+\begin{columns}[T]
+\column{0.40\textwidth}
+\textbf{Vektor $3 \times 1$}
+\begin{lstlisting}
+>> v = [1; 2; 3];
+>> v'
+ans =
+     1     2     3
+\end{lstlisting}
+\small ukuran $3 \times 1 \;\to\; 1 \times 3$
+\column{0.54\textwidth}
+\textbf{Matriks $2 \times 3$}
+\begin{lstlisting}
+>> M = [1 2 3; 4 5 6];
+>> M'
+ans =
+     1     4
+     2     5
+     3     6
+\end{lstlisting}
+\small ukuran $2 \times 3 \;\to\; 3 \times 2$. Cek dengan \cc{size(M')}.
+\end{columns}
+
+\vspace{6pt}
+\small Catatan: ada juga \cc{.'}. Untuk angka riil hasilnya sama dengan \cc{'}; bedanya hanya pada bilangan kompleks.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Aritmetika}
+\sub{Urutan prioritas}
+\begin{columns}[T]
+\column{0.44\textwidth}
+\small Dari yang paling dulu dihitung:
+\begin{enumerate}
+\item kurung \cc{( )}
+\item transpose dan pangkat \cc{'} \cc{^} \cc{.^}
+\item tanda minus di depan angka
+\item \cc{*} \cc{/} \cc{.*} \cc{./} \bsl
+\item \cc{+} \cc{-}
+\item titik dua \cc{:}
+\end{enumerate}
+Setingkat: dihitung dari kiri ke kanan.
+\column{0.50\textwidth}
+\begin{lstlisting}
+2 + 3 * 4   % 14, bukan 20
+(2 + 3) * 4 % 20
+
+-2^2        % -4  (pangkat dulu)
+(-2)^2      %  4
+
+2^3^2       % 64  (kiri ke kanan)
+\end{lstlisting}
+\small Kalau ragu, \alert{pakai kurung}.
+\end{columns}
+\end{frame}
+
+% =====================================================================
+\section{Operator Relasional}
+% =====================================================================
+
+\begin{frame}{Operator Relasional}
+\sub{Apa itu operator relasional?}
+Operator untuk \alert{membandingkan} dua nilai. Hasil operasi dengan operator relasional
+selalu berupa nilai \alert{biner}: \cc{1} artinya \textbf{benar}, \cc{0} artinya \textbf{salah}.
+
+\vspace{8pt}
+\centering\small
+\begin{tabular}{llll}
+\toprule
+Operator & Dibaca & Contoh (\cc{a = 5}, \cc{b = 3}) & Hasil \\
+\midrule
+\cc{==} & sama dengan                 & \cc{a == b} & 0 \\
+\cc{~=} & tidak sama dengan           & \cc{a ~= b} & 1 \\
+\cc{<}  & kurang dari                 & \cc{a < b}  & 0 \\
+\cc{<=} & kurang dari atau sama dengan & \cc{a <= b} & 0 \\
+\cc{>}  & lebih dari                  & \cc{a > b}  & 1 \\
+\cc{>=} & lebih dari atau sama dengan & \cc{a >= b} & 1 \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Relasional}
+\sub{Mencoba di Command Window}
+\begin{columns}[T]
+\column{0.46\textwidth}
+\begin{lstlisting}
+>> a = 5;
+>> b = 3;
+>> a > b
+ans =
+  logical
+   1
+>> t = (a == b)
+t =
+  logical
+   0
+\end{lstlisting}
+\column{0.48\textwidth}
+\small
+\begin{itemize}
+\item 5 lebih dari 3 itu \textbf{benar}, jadi hasilnya \cc{1}.
+\item 5 sama dengan 3 itu \textbf{salah}, jadi hasilnya \cc{0}.
+\item Hasilnya bertipe \cc{logical}: tipe data khusus yang isinya hanya 1 atau 0. Cek dengan \cc{class(t)}.
+\item Nilai logical tetap bisa dihitung: \cc{(a > b) + 1} hasilnya \cc{2}.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Relasional}
+\sub{Dua hal yang sering tertukar}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{1. \cc{=} bukan \cc{==}}
+\begin{lstlisting}
+a = 3     % MENGISI a dengan 3
+a == 3    % BERTANYA: apakah a sama
+          % dengan 3?  -> 1
+\end{lstlisting}
+\small Satu tanda sama dengan untuk menyimpan, dua untuk membandingkan.
+Menulis \cc{if a = 3} akan error.
+\column{0.48\textwidth}
+\textbf{2. Tidak sama dengan: \cc{~=}}
+\begin{lstlisting}
+5 ~= 3    % 1  (benar)
+5 != 3    % error di MATLAB
+\end{lstlisting}
+\small Di Python atau C ditulis \cc{!=}. Di MATLAB tanda ``tidak'' adalah \cc{~} (tilde).
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Relasional}
+\sub{Membandingkan vektor: dicek per elemen}
+Kalau yang dibandingkan vektor, MATLAB mengecek \alert{setiap elemen satu per satu}.
+Hasilnya vektor 1/0 dengan ukuran yang sama.
+
+\begin{columns}[T]
+\column{0.46\textwidth}
+\begin{lstlisting}
+>> x = [4 9 1 7];
+>> x > 5
+ans =
+  1x4 logical array
+   0   1   0   1
+\end{lstlisting}
+\column{0.48\textwidth}
+\centering\small
+\begin{tabular}{lcccc}
+\toprule
+Posisi & 1 & 2 & 3 & 4 \\
+\midrule
+\cc{x}        & 4 & 9 & 1 & 7 \\
+lebih dari 5? & tidak & ya & tidak & ya \\
+\cc{x > 5}    & 0 & \textbf{1} & 0 & \textbf{1} \\
+\bottomrule
+\end{tabular}
+\end{columns}
+
+\vspace{6pt}
+\small Dua vektor juga bisa dibandingkan asal ukurannya sama:
+\cc{[4 9 1 7] == [4 0 1 0]} $\to$ \cc{[1 0 1 0]}.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Relasional}
+\sub{Ingat dulu: mengambil elemen berdasarkan posisi}
+Selama ini kita mengambil elemen dengan menyebut \alert{nomor posisinya}.
+
+\begin{columns}[T]
+\column{0.46\textwidth}
+\begin{lstlisting}
+>> x = [4 9 1 7];
+>> x(2)
+ans =
+     9
+>> x([2 4])
+ans =
+     9     7
+\end{lstlisting}
+\column{0.48\textwidth}
+\centering\small
+\begin{tabular}{lcccc}
+\toprule
+Posisi & 1 & 2 & 3 & 4 \\
+\midrule
+\cc{x} & 4 & \textbf{9} & 1 & \textbf{7} \\
+\bottomrule
+\end{tabular}
+
+\vspace{8pt}
+\raggedright
+\cc{x([2 4])} artinya: ambil elemen di posisi 2 dan posisi 4.
+
+\vspace{6pt}
+Masalahnya: kalau datanya ribuan, kita tidak tahu posisi mana yang nilainya lebih dari 5.
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Relasional}
+\sub{Logical indexing: mengambil elemen dengan vektor 1/0}
+Selain dengan nomor posisi, elemen bisa diambil dengan \alert{vektor logical} yang panjangnya sama:
+elemen di posisi bernilai \cc{1} diambil, posisi bernilai \cc{0} dilewati.
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\centering\small
+\begin{tabular}{lcccc}
+\toprule
+Posisi & 1 & 2 & 3 & 4 \\
+\midrule
+\cc{x}    & 4 & 9 & 1 & 7 \\
+\cc{idx}  & 0 & 1 & 0 & 1 \\
+diambil?  & -- & \textbf{9} & -- & \textbf{7} \\
+\bottomrule
+\end{tabular}
+\column{0.46\textwidth}
+\begin{lstlisting}
+>> idx = x > 5;
+>> x(idx)
+ans =
+     9     7
+\end{lstlisting}
+\end{columns}
+
+\vspace{6pt}
+\small Inilah yang disebut \alert{logical indexing}: memilih data berdasarkan syarat, bukan berdasarkan posisi.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Relasional}
+\sub{Logical indexing dalam satu baris}
+Dua langkah tadi biasanya ditulis sekaligus:
+
+\begin{columns}[T]
+\column{0.46\textwidth}
+\begin{lstlisting}
+% dua langkah
+idx = x > 5;
+x(idx)
+
+% satu langkah (lebih umum)
+x(x > 5)
+\end{lstlisting}
+\column{0.48\textwidth}
+\small Cara membaca \cc{x(x > 5)}:
+\begin{enumerate}
+\item hitung dulu yang di dalam kurung: \cc{x > 5} $\to$ \cc{[0 1 0 1]}
+\item lalu ambil elemen \cc{x} di posisi yang bernilai 1 $\to$ \cc{[9 7]}
+\end{enumerate}
+\vspace{4pt}
+Dibaca: ``elemen \cc{x} yang lebih dari 5''.
+\end{columns}
+
+\vspace{6pt}
+\small Catatan: vektornya harus bertipe logical. \cc{x([0 1 0 1])} dengan angka biasa akan error, karena posisi 0 tidak ada.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Relasional}
+\sub{Kegunaan sehari-hari}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{lstlisting}
+x = [4 9 1 7];
+
+x(x > 5)       % ambil nilainya
+% [9 7]
+
+find(x > 5)    % di posisi mana?
+% [2 4]
+
+x(x > 5) = 0   % ganti nilainya
+% [4 0 1 0]
+\end{lstlisting}
+\column{0.48\textwidth}
+\begin{lstlisting}
+x = [4 9 1 7];
+
+sum(x > 5)     % ada berapa?
+% 2
+
+mean(x > 5)    % berapa proporsinya?
+% 0.5000
+\end{lstlisting}
+\small \cc{sum} dan \cc{mean} bekerja karena 1/0 bisa dijumlahkan: jumlah angka 1 = banyaknya elemen yang memenuhi syarat.
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Relasional}
+\sub{Jebakan: angka desimal dan teks}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Angka desimal}
+\begin{lstlisting}
+>> 0.1 + 0.2 == 0.3
+ans =
+  logical
+   0
+\end{lstlisting}
+\small Komputer menyimpan desimal dengan sedikit pembulatan, jadi \cc{0.1 + 0.2} tidak persis 0.3.
+Bandingkan dengan toleransi:\\
+\cc{abs((0.1+0.2) - 0.3) < 1e-10} $\to$ 1
+\column{0.48\textwidth}
+\textbf{Teks}
+\begin{lstlisting}
+>> 'abc' == 'abd'
+ans =
+  1x3 logical array
+   1   1   0
+\end{lstlisting}
+\small \cc{==} pada teks membandingkan huruf per huruf, dan error kalau panjangnya beda.
+Untuk teks pakai \cc{strcmp('abc','abd')} $\to$ 0.
+\end{columns}
+
+\vspace{4pt}
+\small Membandingkan dua matriks secara utuh: \cc{isequal(A, B)}.
+\end{frame}
+
+% =====================================================================
+\section{Operator Logika}
+% =====================================================================
+
+\begin{frame}{Operator Logika}
+\sub{Apa itu operator logika?}
+Operator relasional menghasilkan satu syarat (1 atau 0). Operator logika dipakai untuk
+\alert{menggabungkan} beberapa syarat atau \alert{membalik} sebuah syarat.
+Masukan dan hasilnya sama-sama 1 (benar) atau 0 (salah).
+
+\vspace{6pt}
+\centering\footnotesize
+\begin{tabular}{lll}
+\toprule
+Operator & Dibaca & Benar jika \ldots \\
+\midrule
+\cc{&}    & dan               & kedua syarat benar \\
+\cc{|}    & atau              & minimal satu syarat benar \\
+\cc{~}    & tidak             & syaratnya salah (dibalik) \\
+\cc{&&}   & dan (short-circuit)  & seperti \cc{&}, khusus satu nilai, untuk \cc{if}/\cc{while} \\
+\cc{||}   & atau (short-circuit) & seperti \cc{|}, khusus satu nilai, untuk \cc{if}/\cc{while} \\
+\cc{xor}  & salah satu saja   & tepat satu syarat benar, tidak boleh dua-duanya \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{Kenapa perlu? Contoh: ``apakah x di antara 2 dan 8?''}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Cara matematika: \alert{salah} di MATLAB}
+\begin{lstlisting}
+>> x = 10;
+>> 2 < x < 8
+ans =
+  logical
+   1          % padahal 10 > 8 !
+\end{lstlisting}
+\small MATLAB menghitung dari kiri: \cc{2 < 10} $\to$ 1, lalu \cc{1 < 8} $\to$ 1.
+\column{0.48\textwidth}
+\textbf{Cara yang benar: dua syarat digabung}
+\begin{lstlisting}
+>> (x > 2) & (x < 8)
+ans =
+  logical
+   0
+\end{lstlisting}
+\small Syarat 1: \cc{x > 2} $\to$ 1\\
+Syarat 2: \cc{x < 8} $\to$ 0\\
+Digabung dengan ``dan'' $\to$ 0. Benar.
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{\cc{&} (dan): benar jika \emph{kedua} syarat benar}
+\small Contoh: mahasiswa \alert{lulus} jika nilai teori $\geq 60$ \textbf{dan} nilai praktik $\geq 60$.
+
+\begin{columns}[T]
+\column{0.24\textwidth}
+\centering
+\begin{tabular}{ccc}
+\toprule
+A & B & \cc{A & B} \\
+\midrule
+0 & 0 & 0 \\
+0 & 1 & 0 \\
+1 & 0 & 0 \\
+1 & 1 & \textbf{1} \\
+\bottomrule
+\end{tabular}
+\column{0.36\textwidth}
+\begin{lstlisting}
+teori   = [70 50 80];
+praktik = [65 90 55];
+
+lulus = (teori >= 60) & ...
+        (praktik >= 60)
+% lulus = [1 0 0]
+\end{lstlisting}
+\column{0.34\textwidth}
+\centering\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Mhs & 1 & 2 & 3 \\
+\midrule
+teori $\geq$ 60   & 1 & 0 & 1 \\
+praktik $\geq$ 60 & 1 & 1 & 0 \\
+\cc{&}            & \textbf{1} & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{columns}
+
+\vspace{6pt}
+\small Satu nilai: \cc{(5 > 3) & (2 > 4)} $\to$ \cc{1 & 0} $\to$ \cc{0}. Bentuk fungsi: \cc{and(A, B)}.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{\cc{|} (atau): benar jika \emph{minimal satu} syarat benar}
+\small Contoh: mahasiswa \alert{remedial} jika nilai teori $< 60$ \textbf{atau} nilai praktik $< 60$.
+
+\begin{columns}[T]
+\column{0.24\textwidth}
+\centering
+\begin{tabular}{ccc}
+\toprule
+A & B & \cc{A | B} \\
+\midrule
+0 & 0 & 0 \\
+0 & 1 & \textbf{1} \\
+1 & 0 & \textbf{1} \\
+1 & 1 & \textbf{1} \\
+\bottomrule
+\end{tabular}
+\column{0.36\textwidth}
+\begin{lstlisting}
+teori   = [70 50 80];
+praktik = [65 90 55];
+
+rem = (teori < 60) | ...
+      (praktik < 60)
+% rem = [0 1 1]
+\end{lstlisting}
+\column{0.34\textwidth}
+\centering\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Mhs & 1 & 2 & 3 \\
+\midrule
+teori $<$ 60   & 0 & 1 & 0 \\
+praktik $<$ 60 & 0 & 0 & 1 \\
+\cc{|}         & 0 & \textbf{1} & \textbf{1} \\
+\bottomrule
+\end{tabular}
+\end{columns}
+
+\vspace{6pt}
+\small Satu nilai: \cc{(5 > 3) | (2 > 4)} $\to$ \cc{1 | 0} $\to$ \cc{1}. Bentuk fungsi: \cc{or(A, B)}.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{\cc{~} (tidak): membalik syarat}
+\small Benar jadi salah, salah jadi benar. Contoh: siapa yang \alert{tidak lulus}?
+
+\begin{columns}[T]
+\column{0.24\textwidth}
+\centering
+\begin{tabular}{cc}
+\toprule
+A & \cc{~A} \\
+\midrule
+0 & \textbf{1} \\
+1 & 0 \\
+\bottomrule
+\end{tabular}
+\column{0.40\textwidth}
+\begin{lstlisting}
+lulus = [1 0 0];
+~lulus
+% [0 1 1]
+
+~(5 > 3)    % ~1
+% 0
+\end{lstlisting}
+\column{0.30\textwidth}
+\small Hasil \cc{~lulus} sama dengan \cc{rem} di slide sebelumnya: ``tidak lulus'' = ``remedial''.
+\end{columns}
+
+\vspace{6pt}
+\small Tanda \cc{~} yang sama dipakai di \cc{~=} (tidak sama dengan). Bentuk fungsi: \cc{not(A)}.\\
+Angka selain 0 dianggap benar: \cc{~5} $\to$ 0, \cc{~0} $\to$ 1.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{\cc{&&} (dan, short-circuit): idenya}
+\small Analogi: satpam gedung mengecek \alert{dulu} apakah tamu membawa KTP. Kalau tidak bawa,
+tamu langsung ditolak; satpam \alert{tidak perlu} mencari nama di daftar tamu.
+
+\vspace{4pt}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Aturannya}
+\begin{itemize}
+\item Syarat kiri dicek lebih dulu.
+\item Kiri \textbf{salah} $\to$ hasil pasti 0, syarat kanan \alert{dilewati}.
+\item Kiri \textbf{benar} $\to$ syarat kanan baru dicek.
+\end{itemize}
+\column{0.48\textwidth}
+\textbf{Bedanya dengan \cc{&}}
+\begin{itemize}
+\item \cc{&} selalu mengecek \alert{dua-duanya}.
+\item \cc{&&} hanya untuk \alert{satu nilai} di tiap sisi, jadi dipakai di \cc{if} dan \cc{while}.
+\item Kegunaan utamanya: syarat kiri \alert{melindungi} syarat kanan dari error.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{\cc{&&}: contoh mengecek nilai mahasiswa ke-\cc{k}}
+\lstset{basicstyle=\ttfamily\footnotesize}
+\small Data nilai hanya ada untuk 3 mahasiswa. Kita ingin mengecek apakah mahasiswa ke-\cc{k} lulus.
+
+\begin{columns}[T]
+\column{0.56\textwidth}
+\begin{lstlisting}
+nilai = [70 50 80];   % 3 mahasiswa
+k = 5;                % mahasiswa ke-5 tidak ada
+
+if k <= numel(nilai) && nilai(k) >= 60
+    disp('Lulus')
+else
+    disp('Tidak lulus / tidak ada')
+end
+% Tidak lulus / tidak ada
+\end{lstlisting}
+\small Kalau \cc{&&} diganti \cc{&}: \textcolor{mlorange}{error}, \emph{Index exceeds the number of array elements}.
+\column{0.40\textwidth}
+\footnotesize
+\begin{tabular}{lcc}
+\toprule
+ & \cc{k = 2} & \cc{k = 5} \\
+\midrule
+\cc{k <= 3}         & 1 & 0 \\
+\cc{nilai(k) >= 60} & 0 & \textit{dilewati} \\
+hasil \cc{&&}       & 0 & 0 \\
+\bottomrule
+\end{tabular}
+
+\vspace{6pt}
+\small \cc{numel(nilai)} = banyaknya elemen (3).\\[4pt]
+Saat \cc{k = 5}, syarat kiri sudah salah, jadi \cc{nilai(5)} tidak pernah dijalankan.
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{\cc{||} (atau, short-circuit): idenya}
+\small Analogi: mahasiswa boleh ikut ujian jika kehadirannya $\geq$ 75\% \textbf{atau} punya surat izin.
+Kalau kehadirannya sudah cukup, dosen \alert{tidak perlu} memeriksa surat izin.
+
+\vspace{4pt}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Aturannya}
+\begin{itemize}
+\item Syarat kiri dicek lebih dulu.
+\item Kiri \textbf{benar} $\to$ hasil pasti 1, syarat kanan \alert{dilewati}.
+\item Kiri \textbf{salah} $\to$ syarat kanan baru dicek.
+\end{itemize}
+\column{0.48\textwidth}
+\begin{lstlisting}
+hadir = 80;      % persen
+izin  = false;
+
+if hadir >= 75 || izin
+    disp('Boleh ikut ujian')
+end
+% hadir >= 75 -> 1,
+% izin tidak dicek lagi
+\end{lstlisting}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{\cc{||}: contoh mencari mahasiswa yang perlu ditindaklanjuti}
+\small Mahasiswa ke-\cc{k} perlu ditindaklanjuti jika datanya \alert{tidak ada} \textbf{atau} nilainya di bawah 60.
+
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{lstlisting}
+nilai = [70 50 80];
+k = 5;
+
+if k > numel(nilai) || nilai(k) < 60
+    disp('Perlu ditindaklanjuti')
+else
+    disp('Aman')
+end
+% Perlu ditindaklanjuti
+\end{lstlisting}
+\column{0.44\textwidth}
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+ & \cc{k = 1} & \cc{k = 2} & \cc{k = 5} \\
+\midrule
+\cc{k > 3}         & 0 & 0 & 1 \\
+\cc{nilai(k) < 60} & 0 & 1 & \textit{dilewati} \\
+hasil \cc{||}      & 0 & 1 & 1 \\
+\bottomrule
+\end{tabular}
+
+\vspace{6pt}
+\small Saat \cc{k = 5}, syarat kiri sudah benar, jadi \cc{nilai(5)} tidak dijalankan. Dengan \cc{|} biasa, baris ini error.
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Logika}
+\sub{\cc{xor} (salah satu saja)}
+\small Benar jika \alert{tepat satu} syarat benar; kalau dua-duanya benar justru salah.
+Berupa fungsi, tidak ada simbolnya. Contoh: siapa yang lulus \alert{hanya satu} ujian?
+
+\begin{columns}[T]
+\column{0.24\textwidth}
+\centering
+\begin{tabular}{ccc}
+\toprule
+A & B & \cc{xor} \\
+\midrule
+0 & 0 & 0 \\
+0 & 1 & \textbf{1} \\
+1 & 0 & \textbf{1} \\
+1 & 1 & 0 \\
+\bottomrule
+\end{tabular}
+\column{0.36\textwidth}
+\begin{lstlisting}
+teori   = [70 50 80];
+praktik = [65 90 55];
+
+satu = xor(teori >= 60, ...
+           praktik >= 60)
+% satu = [0 1 1]
+\end{lstlisting}
+\column{0.34\textwidth}
+\centering\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Mhs & 1 & 2 & 3 \\
+\midrule
+teori $\geq$ 60   & 1 & 0 & 1 \\
+praktik $\geq$ 60 & 1 & 1 & 0 \\
+\cc{xor}          & 0 & \textbf{1} & \textbf{1} \\
+\bottomrule
+\end{tabular}
+\end{columns}
+
+\vspace{6pt}
+\small Bandingkan dengan \cc{|}: mahasiswa 1 lulus dua-duanya, jadi \cc{|} $\to$ 1 tetapi \cc{xor} $\to$ 0.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}{Operator Logika}
+\sub{Ringkasan: kapan pakai yang mana?}
+\centering\small
+\begin{tabular}{lll}
+\toprule
+Situasi & Pakai & Contoh \\
+\midrule
+Menyaring data (vektor/matriks)   & \cc{&} \cc{|} \cc{~} & \cc{x((x > 2) & (x < 8))} \\
+Syarat di \cc{if} / \cc{while}    & \cc{&&} \cc{||} \cc{~} & \cc{if n > 0 && rata > 10} \\
+Tepat satu syarat yang benar      & \cc{xor} & \cc{xor(A, B)} \\
+\bottomrule
+\end{tabular}
+
+\vspace{10pt}
+\raggedright
+Aturan praktis: kalau datanya \alert{lebih dari satu nilai}, pakai \cc{&} dan \cc{|} (satu garis).
+Kalau syaratnya \alert{satu nilai} untuk mengambil keputusan, pakai \cc{&&} dan \cc{||} (dua garis).
+\end{frame}
+
+% =====================================================================
+\section{Operator Lain-lain}
+% =====================================================================
+
+\begin{frame}{Operator Lain-lain}
+\sub{Ringkasan}
+\footnotesize
+\centering
+\begin{tabular}{lp{0.8\textwidth}}
+\toprule
+Operator & Fungsi \\
+\midrule
+\cc{:}   & range (\cc{1:5}, \cc{0:0.1:1}) atau ``semua'' dalam indeks (\cc{A(:,2)}) \\
+\cc{( )} & indeks array, argumen fungsi \\
+\cc{{ }} & isi cell array atau isi table (\cc{T{1,1}}) \\
+\cc{[ ]} & membentuk matriks, menggabungkan (\cc{[A B]} horizontal, \cc{[A; B]} vertikal) \\
+\cc{.}   & akses field struct atau kolom table (\cc{S.x}, \cc{T.NamaKolom}) \\
+\cc{;}   & pisah baris dalam \cc{[ ]}, atau menekan output di akhir baris \\
+\cc{,}   & pisah kolom atau argumen \\
+\texttt{\%}   & komentar (\texttt{\%\%} untuk section) \\
+\cc{...} & lanjut ke baris berikutnya \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Titik dua \cc{:}}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Membuat deret} \cc{awal:langkah:akhir}
+\begin{lstlisting}
+1:5          % langkah 1 (default)
+% [1 2 3 4 5]
+
+0:0.25:1     % langkah 0.25
+% [0 0.25 0.5 0.75 1]
+
+10:-2:2      % menurun
+% [10 8 6 4 2]
+\end{lstlisting}
+\column{0.48\textwidth}
+\textbf{Artinya ``semua'' dalam indeks}
+\begin{lstlisting}
+A = [1 2 3; 4 5 6];
+
+A(:, 2)      % semua baris, kolom 2
+% [2; 5]
+
+A(1, :)      % baris 1, semua kolom
+% [1 2 3]
+
+A(:)         % semua elemen, 1 kolom
+% [1; 4; 2; 5; 3; 6]
+\end{lstlisting}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Kurung biasa \cc{( )}}
+\begin{columns}[T]
+\column{0.31\textwidth}
+\textbf{Untuk mengindeks}
+\begin{lstlisting}
+x = [4 9 1 7];
+x(3)
+% 1
+
+A = [1 2 3; 4 5 6];
+A(2, 1)    % baris 2,
+% 4        % kolom 1
+\end{lstlisting}
+\column{0.33\textwidth}
+\textbf{Untuk argumen fungsi}
+\begin{lstlisting}
+max(x)
+% 9
+
+round(3.14159, 2)
+% 3.14
+
+zeros(2, 3)
+% matriks 0 ukuran 2x3
+\end{lstlisting}
+\column{0.30\textwidth}
+\textbf{Untuk urutan hitung}
+\begin{lstlisting}
+2 + 3 * 4
+% 14
+
+(2 + 3) * 4
+% 20
+\end{lstlisting}
+\end{columns}
+
+\vspace{6pt}
+\small Indeks di MATLAB mulai dari \alert{1}, bukan 0. Urutannya selalu (baris, kolom).
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Kurung kurawal \cc{{ }}}
+\small Cell array: wadah yang tiap selnya boleh berisi \alert{tipe data berbeda}.
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Cell array}
+\begin{lstlisting}
+C = {'Yogyakarta', 2023, [1 2 3]};
+
+C{1}      % ISI sel ke-1
+% 'Yogyakarta'
+
+C(1)      % SEL ke-1 (masih cell)
+% {'Yogyakarta'}
+\end{lstlisting}
+\column{0.48\textwidth}
+\textbf{Table}
+\begin{lstlisting}
+T = table([1;2], [3;4], ...
+    'VariableNames', {'x','y'});
+
+T{1, 2}   % isi baris 1, kolom 2
+% 3
+
+T{:, :}   % seluruh isi jadi matriks
+% [1 3; 2 4]
+\end{lstlisting}
+\end{columns}
+
+\vspace{4pt}
+\small Cara ingat: \cc{{ }} mengambil \alert{isi}, \cc{( )} mengambil \alert{wadahnya}.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Kurung siku \cc{[ ]}}
+\begin{columns}[T]
+\column{0.31\textwidth}
+\textbf{Membuat vektor/matriks}
+\begin{lstlisting}
+[1 2 3]      % baris
+[1; 2; 3]    % kolom
+[1 2; 3 4]   % 2x2
+\end{lstlisting}
+\column{0.33\textwidth}
+\textbf{Menggabungkan matriks}
+\begin{lstlisting}
+a = [1 2];
+b = [3 4];
+
+[a b]     % ke samping
+% [1 2 3 4]
+
+[a; b]    % ke bawah
+% [1 2; 3 4]
+\end{lstlisting}
+\column{0.30\textwidth}
+\textbf{Menghapus elemen}
+\begin{lstlisting}
+x = [4 9 1 7];
+x(2) = []
+% [4 1 7]
+
+y = [];   % kosong
+\end{lstlisting}
+\end{columns}
+
+\vspace{6pt}
+\small Syarat: ke samping jumlah baris sama; ke bawah jumlah kolom sama.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Titik \cc{.}}
+\small Mengakses bagian bernama di dalam struct atau table.
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Struct}
+\begin{lstlisting}
+S.nama = 'Budi';
+S.umur = 25;
+
+S.nama
+% 'Budi'
+
+S.umur + 1
+% 26
+\end{lstlisting}
+\column{0.48\textwidth}
+\textbf{Kolom table}
+\begin{lstlisting}
+T = table([1;2], [3;4], ...
+    'VariableNames', {'x','y'});
+
+T.y          % kolom bernama y
+% [3; 4]
+\end{lstlisting}
+\end{columns}
+
+\vspace{4pt}
+\small Jangan tertukar dengan \cc{.*} \cc{./} \cc{.^}: di sana titik artinya ``per elemen''.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Titik koma \cc{;}}
+\begin{columns}[T]
+\column{0.31\textwidth}
+\textbf{Memisahkan baris matriks}
+\begin{lstlisting}
+[1 2; 3 4]
+% ans =
+%    1   2
+%    3   4
+\end{lstlisting}
+\column{0.33\textwidth}
+\textbf{Menyembunyikan hasil}
+\begin{lstlisting}
+>> a = 5
+a =
+     5
+>> b = 7;
+>>            % tidak tampil
+\end{lstlisting}
+\column{0.30\textwidth}
+\textbf{Beberapa perintah satu baris}
+\begin{lstlisting}
+a = 1; b = 2;
+c = a + b;
+\end{lstlisting}
+\end{columns}
+
+\vspace{6pt}
+\small \textbf{Wajib di akhir baris? Tidak.} Pindah baris sudah mengakhiri perintah. Fungsinya hanya menyembunyikan hasil.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Titik koma \cc{;} di dalam function}
+\small Secara aturan tidak wajib, tetapi di function hampir \alert{selalu} dipakai. Tanpa \cc{;}, hasil antara ikut tercetak setiap kali function dipanggil.
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{File \cc{kuadrat_plus.m}}
+\begin{lstlisting}
+function y = kuadrat_plus(x)
+z = x^2        % lupa titik koma
+y = z + 1;
+end
+\end{lstlisting}
+\column{0.48\textwidth}
+\textbf{Saat dipanggil}
+\begin{lstlisting}
+>> a = kuadrat_plus(3);
+z =
+     9
+\end{lstlisting}
+\small \cc{z} tetap muncul walau pemanggilnya sudah pakai \cc{;}, karena \cc{;} di luar tidak berlaku untuk baris di dalam function.
+\end{columns}
+
+\vspace{4pt}
+\small Kebiasaan baik: akhiri setiap baris perhitungan di function dan skrip dengan \cc{;}. Hapus \cc{;} sementara hanya saat ingin melihat hasil antara (debugging).
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Koma \cc{,}}
+\begin{columns}[T]
+\column{0.31\textwidth}
+\textbf{Memisahkan kolom matriks}
+\begin{lstlisting}
+[1, 2, 3]
+% sama dengan [1 2 3]
+\end{lstlisting}
+\column{0.33\textwidth}
+\textbf{Memisahkan argumen}
+\begin{lstlisting}
+zeros(2, 3)
+round(3.14159, 2)
+A(2, 3)
+% baris 2, kolom 3
+\end{lstlisting}
+\column{0.30\textwidth}
+\textbf{Memisahkan perintah}
+\begin{lstlisting}
+>> a = 1, b = 2
+a =
+     1
+b =
+     2
+\end{lstlisting}
+\end{columns}
+
+\vspace{6pt}
+\small Bedanya dengan \cc{;}: koma memisahkan tanpa menyembunyikan output.
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Komentar \texttt{\%} dan section \texttt{\%\%}}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{lstlisting}
+%% Bagian 1: Data
+x = [4 9 1 7];   % data contoh
+
+%% Bagian 2: Analisis
+rata = mean(x);  % rata-rata
+
+%{
+Komentar beberapa baris
+sekaligus
+%}
+\end{lstlisting}
+\column{0.46\textwidth}
+\small
+\begin{itemize}
+\item Teks setelah \texttt{\%} diabaikan MATLAB: untuk catatan.
+\item \texttt{\%\%} di awal baris membagi skrip menjadi \alert{section}. Satu section bisa dijalankan sendiri dengan \textbf{Run Section} (Ctrl+Enter, di Mac Cmd+Enter).
+\item \texttt{\%\{} \ldots{} \texttt{\%\}} untuk komentar beberapa baris.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}[fragile]{Operator Lain-lain}
+\sub{Tiga titik \cc{...}}
+Menyambung perintah yang terlalu panjang ke baris berikutnya.
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Rumus panjang}
+\begin{lstlisting}
+total = harga_1 + harga_2 + ...
+        harga_3 + harga_4;
+\end{lstlisting}
+\textbf{Matriks panjang}
+\begin{lstlisting}
+x = [1 2 3 4 5 ...
+     6 7 8 9 10];
+\end{lstlisting}
+\column{0.48\textwidth}
+\textbf{Argumen fungsi}
+\begin{lstlisting}
+T = table([1;2], [3;4], ...
+    'VariableNames', {'x','y'});
+\end{lstlisting}
+\small MATLAB membaca semuanya sebagai \alert{satu} perintah. Teks setelah \cc{...} di baris itu dianggap komentar.
+\end{columns}
+\end{frame}
+
+\end{document}
