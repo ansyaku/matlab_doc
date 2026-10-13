@@ -1,0 +1,1182 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage[indonesian]{babel}
+\usepackage{fontspec}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+\usetheme{metropolis}
+\setsansfont{FiraSans}[Extension=.otf,UprightFont=*-Regular,BoldFont=*-Bold,ItalicFont=*-Italic,BoldItalicFont=*-BoldItalic]
+\setmonofont{FiraMono}[Extension=.otf,UprightFont=*-Regular,BoldFont=*-Bold,ItalicFont=*-Oblique,BoldItalicFont=*-BoldOblique,Scale=MatchLowercase]
+\setbeamertemplate{caption}[numbered]
+
+% ---------- gaya kode MATLAB ----------
+\definecolor{alertc}{HTML}{EB811B}
+\definecolor{okc}{HTML}{14B03D}
+\definecolor{mlkw}{HTML}{0000C8}
+\definecolor{mlcm}{HTML}{228B22}
+\definecolor{mlst}{HTML}{A020F0}
+\newcommand{\codesize}{\footnotesize}
+\lstdefinestyle{matlab}{
+  language=Matlab,
+  morekeywords={continue,break,true,false},
+  basicstyle=\ttfamily\codesize,
+  keywordstyle=\color{mlkw}\bfseries,
+  commentstyle=\color{mlcm}\itshape,
+  stringstyle=\color{mlst},
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  frame=single,
+  rulecolor=\color{black!25},
+  backgroundcolor=\color{black!3},
+  framesep=4pt,
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=2pt,
+  belowskip=2pt
+}
+\lstdefinestyle{out}{
+  basicstyle=\ttfamily\codesize,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  rulecolor=\color{alertc!50},
+  backgroundcolor=\color{white},
+  framesep=4pt,
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=2pt,
+  belowskip=2pt
+}
+\lstset{style=matlab}
+
+\newcommand{\kode}[1]{\texttt{#1}}
+\newcommand{\labelkode}{{\scriptsize\color{black!60}Kode}}
+\newcommand{\labelout}{{\scriptsize\color{alertc}Output di Command Window}}
+
+% gaya flowchart bersama
+\tikzset{
+  box/.style={draw,rounded corners,minimum height=8mm,minimum width=26mm,font=\small,align=center},
+  dec/.style={draw,diamond,aspect=2.4,inner sep=1pt,font=\small,align=center},
+  lbl/.style={font=\scriptsize},
+}
+
+\title{Break, Continue, dan Pause}
+\subtitle{Mengatur alur loop di MATLAB}
+\author{Pemrograman MATLAB}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% =====================================================
+\begin{frame}[fragile]{Isi Presentasi}
+  \tableofcontents
+\end{frame}
+
+% =====================================================
+\section{Pengantar}
+
+\begin{frame}[fragile]{Mengingat kembali: cara kerja loop}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      Sebuah loop mengulang \alert{badan loop} (baris di antara \kode{for}/\kode{while} dan \kode{end}).
+      Satu kali putaran disebut satu \alert{iterasi}.
+      \vspace{6pt}
+\begin{lstlisting}
+for i = 1:4          % kepala loop
+    a = i^2;         % \
+    disp(a)          % / badan loop
+end                  % kembali ke kepala
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      Secara bawaan, setiap iterasi:
+      \begin{enumerate}
+        \item menjalankan \alert{semua} baris di badan loop, dari atas ke bawah;
+        \item kembali ke kepala loop;
+        \item mengulang sampai nilai \kode{i} habis (\kode{for}) atau kondisi bernilai salah (\kode{while}).
+      \end{enumerate}
+      \vspace{4pt}
+      Alur ini \alert{kaku}: semua iterasi dijalankan penuh, tanpa jeda.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Mengapa alur loop perlu diatur?}
+  Bayangkan Anda memeriksa setumpuk 100 berkas, satu per satu.
+  \vspace{6pt}
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      \begin{block}{\kode{break}}
+        Berkas yang dicari \alert{sudah ketemu} di tumpukan ke-12. Tidak ada gunanya memeriksa 88 sisanya:
+        \textbf{berhenti}.
+      \end{block}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{block}{\kode{continue}}
+        Berkas ke-7 \alert{kosong}. Tidak perlu dibaca, tetapi pemeriksaan belum selesai:
+        \textbf{sisihkan, lanjut ke berkas berikutnya}.
+      \end{block}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{block}{\kode{pause}}
+        Setelah tiap 10 berkas, Anda \alert{berhenti sejenak} untuk melapor, lalu
+        \textbf{melanjutkan dari posisi yang sama}.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{8pt}
+  \begin{alertblock}{Gagasan utama}
+    \kode{break} dan \kode{continue} mengubah \alert{alur} loop (iterasi mana yang dijalankan).
+    \kode{pause} tidak mengubah alur, hanya mengatur \alert{waktu} eksekusi.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Tujuan pembelajaran}
+  Setelah materi ini, Anda diharapkan mampu:
+  \begin{enumerate}
+    \item menjelaskan perbedaan efek \kode{break}, \kode{continue}, dan \kode{pause} terhadap jalannya program;
+    \item menelusuri (\textit{trace}) loop yang berisi \kode{break}/\kode{continue} dan menebak output-nya;
+    \item menangani loop bersarang, termasuk keluar dari beberapa loop sekaligus;
+    \item menghindari jebakan umum, misalnya loop tak berujung akibat \kode{continue} di \kode{while};
+    \item memilih alat yang tepat: \kode{break}, \kode{continue}, kondisi \kode{while}, atau operasi vektor.
+  \end{enumerate}
+\end{frame}
+
+% =====================================================
+\section{Break}
+
+\begin{frame}[fragile]{\kode{break}: konsep}
+  \begin{block}{Definisi}
+    \kode{break} menghentikan loop (\kode{for} atau \kode{while}) \alert{seketika}. Baris yang tersisa
+    di badan loop tidak dijalankan, iterasi berikutnya tidak pernah terjadi, dan program melompat ke
+    \alert{baris pertama setelah \kode{end}} milik loop tersebut.
+  \end{block}
+  \vspace{4pt}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Pola penulisan}
+\begin{lstlisting}
+for ...
+    if <kondisi berhenti>
+        break;
+    end
+    <proses>
+end
+<baris setelah loop>
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Catatan}
+      \begin{itemize}
+        \item \kode{break} hampir selalu diletakkan di dalam \kode{if}. Tanpa \kode{if}, loop pasti berhenti pada iterasi pertama.
+        \item \kode{break} hanya bermakna di dalam loop. Untuk keluar dari fungsi, gunakan \kode{return}.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{\kode{break}: contoh dasar}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \labelkode
+\begin{lstlisting}
+for i = 1:10
+    if i == 5
+        break;
+    end
+    disp(i)
+end
+disp('selesai')
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \labelout
+\begin{lstlisting}[style=out]
+1
+2
+3
+4
+selesai
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \vspace{6pt}
+  Perhatikan tiga hal:
+  \begin{itemize}
+    \item \kode{5} \alert{tidak} dicetak, karena \kode{break} terjadi sebelum \kode{disp(i)}.
+    \item Nilai \kode{6} sampai \kode{10} tidak pernah diproses.
+    \item \kode{'selesai'} tetap dicetak, karena \kode{break} hanya mengakhiri loop, bukan program.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Menelusuri \kode{break} iterasi demi iterasi}
+  \centering
+  \begin{tabular}{@{}cccl@{}}
+    \toprule
+    \kode{i} & \kode{i == 5}? & Aksi & Output \\
+    \midrule
+    1 & tidak & jalankan \kode{disp(i)} & \kode{1} \\
+    2 & tidak & jalankan \kode{disp(i)} & \kode{2} \\
+    3 & tidak & jalankan \kode{disp(i)} & \kode{3} \\
+    4 & tidak & jalankan \kode{disp(i)} & \kode{4} \\
+    5 & \alert{ya} & \alert{\kode{break}} $\rightarrow$ keluar loop & -- \\
+    6--10 & -- & \textcolor{black!50}{tidak pernah dijalankan} & -- \\
+    \midrule
+    \multicolumn{3}{@{}l}{setelah loop: \kode{disp('selesai')}} & \kode{selesai} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{10pt}
+  \raggedright
+  \begin{exampleblock}{Kebiasaan baik}
+    Saat ragu dengan output sebuah loop, buat tabel seperti ini: satu baris per iterasi, catat nilai
+    variabel, hasil kondisi, dan aksi yang terjadi.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Alur eksekusi \kode{break}}
+  \centering
+  \begin{tikzpicture}[node distance=9mm and 14mm, >=Stealth]
+    \node[box] (start) {Iterasi ke-$i$};
+    \node[dec,right=of start] (cek) {\kode{i == 5}?};
+    \node[box,right=of cek] (proses) {Proses\\\kode{disp(i)}};
+    \node[box,below=of cek,fill=alertc!15] (brk) {\kode{break}};
+    \node[box,below=of proses] (after) {Lanjut ke\\baris setelah loop};
+    \draw[->] (start) -- (cek);
+    \draw[->] (cek) -- node[above,lbl]{tidak} (proses);
+    \draw[->] (cek) -- node[right,lbl]{ya} (brk);
+    \draw[->] (brk) -- (after);
+    \draw[->] (proses.north) -- ++(0,6mm) -| node[above,pos=.25,lbl]{iterasi berikutnya} (start.north);
+  \end{tikzpicture}
+
+  \vspace{8pt}
+  \raggedright
+  Jalur ``ya'' \alert{tidak pernah kembali} ke kepala loop. Itulah yang membedakan \kode{break} dari
+  \kode{continue} (lihat bagian berikutnya).
+\end{frame}
+
+\begin{frame}[fragile]{Miskonsepsi: ``\kode{break} keluar dari \kode{if}''}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \labelkode
+\begin{lstlisting}
+for i = 1:3
+    if i == 2
+        disp('masuk if');
+        break;
+    end
+    disp(['akhir iterasi ', num2str(i)]);
+end
+disp('di luar loop');
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \labelout
+\begin{lstlisting}[style=out]
+akhir iterasi 1
+masuk if
+di luar loop
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \vspace{6pt}
+  \begin{alertblock}{Yang sering salah dipahami}
+    Walaupun ditulis di dalam \kode{if}, \kode{break} mengakhiri \alert{loop} yang membungkusnya, bukan
+    \kode{if}-nya. Karena itu \kode{'akhir iterasi 2'} tidak pernah dicetak, dan iterasi \kode{i = 3}
+    tidak terjadi. \kode{if}, \kode{switch}, dan blok lain \alert{bukan} loop.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{\kode{break} pada \kode{while}}
+  \kode{break} sering dipasangkan dengan \kode{while true}: loop yang ``tak berujung'' secara sengaja,
+  dan \kode{break} menjadi satu-satunya pintu keluar.
+  \vspace{4pt}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \labelkode
+\begin{lstlisting}
+% Jumlahkan 1+2+3+... sampai total > 20
+total = 0;
+n = 0;
+while true
+    n = n + 1;
+    total = total + n;
+    if total > 20
+        break;
+    end
+end
+fprintf('n = %d, total = %d\n', n, total);
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \labelout
+\begin{lstlisting}[style=out]
+n = 6, total = 21
+\end{lstlisting}
+      \vspace{4pt}
+      \footnotesize
+      Penelusuran \kode{total}: 1, 3, 6, 10, 15, \alert{21}. Saat \kode{total} melewati 20, loop berhenti.
+      \vspace{4pt}
+
+      Pola ini cocok bila \alert{jumlah iterasi tidak diketahui} di awal. Pastikan kondisi \kode{break}
+      pasti tercapai; jika tidak, program berjalan selamanya (hentikan dengan \kode{Ctrl+C}).
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{\kode{break} pada loop bersarang}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \labelkode
+\begin{lstlisting}
+for i = 1:3
+    for j = 1:3
+        if j == 2
+            break;   % hanya loop j
+        end
+        fprintf('i=%d j=%d\n', i, j);
+    end
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.35\textwidth}
+      \labelout
+\begin{lstlisting}[style=out]
+i=1 j=1
+i=2 j=1
+i=3 j=1
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \vspace{6pt}
+  \begin{alertblock}{Aturan}
+    \kode{break} hanya keluar dari loop yang \alert{paling dalam} tempat ia berada. Di sini, setiap kali
+    \kode{j == 2}, loop \kode{j} berhenti, tetapi loop \kode{i} tetap lanjut ke nilai berikutnya.
+    Akibatnya \kode{j = 3} tidak pernah dicapai, sedangkan \kode{i} tetap berjalan 1, 2, 3.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Keluar dari dua loop sekaligus: pakai penanda (\textit{flag})}
+  \renewcommand{\codesize}{\scriptsize}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \labelkode
+\begin{lstlisting}
+A = [3 7 2; 8 5 1; 4 9 6];
+ketemu = false;               % penanda
+
+for r = 1:size(A,1)
+    for c = 1:size(A,2)
+        if A(r,c) > 7
+            ketemu = true;
+            break;            % keluar loop c
+        end
+    end
+    if ketemu
+        break;                % keluar loop r
+    end
+end
+
+if ketemu
+    fprintf('Pertama > 7: baris %d kolom %d\n', ...
+        r, c);
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \labelout
+\begin{lstlisting}[style=out]
+Pertama > 7: baris 2 kolom 1
+\end{lstlisting}
+      \vspace{4pt}
+      \footnotesize
+      \begin{itemize}
+        \item \kode{break} pertama hanya keluar dari loop \kode{c}. Penanda \kode{ketemu} ``membawa kabar''
+              ke loop \kode{r} agar ikut berhenti.
+        \item Setelah \kode{break}, nilai variabel loop (\kode{r}, \kode{c}) \alert{tetap tersimpan}, sehingga
+              posisi elemen bisa dipakai di luar loop.
+        \item Di dalam fungsi, \kode{return} juga bisa dipakai untuk keluar dari semua loop sekaligus.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================
+\section{Continue}
+
+\begin{frame}[fragile]{\kode{continue}: konsep}
+  \begin{block}{Definisi}
+    \kode{continue} melewati \alert{sisa badan loop} pada iterasi saat ini, lalu langsung kembali ke kepala
+    loop untuk memulai \alert{iterasi berikutnya}. Loop \alert{tidak} berhenti.
+  \end{block}
+  \vspace{4pt}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Pola penulisan}
+\begin{lstlisting}
+for ...
+    if <kondisi dilewati>
+        continue;
+    end
+    <proses>    % dilewati
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Catatan}
+      \begin{itemize}
+        \item Baris \alert{sebelum} \kode{continue} tetap dijalankan; hanya baris \alert{sesudahnya} yang dilewati.
+        \item Pada \kode{for}, variabel loop tetap maju ke nilai berikutnya secara otomatis.
+        \item Seperti \kode{break}, \kode{continue} hanya berlaku pada loop terdalam.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{\kode{continue}: contoh dasar}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \labelkode
+\begin{lstlisting}
+for i = 1:5
+    if i == 3
+        continue;
+    end
+    disp(i)
+end
+disp('selesai')
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \labelout
+\begin{lstlisting}[style=out]
+1
+2
+4
+5
+selesai
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \vspace{6pt}
+  \centering
+  \begin{tabular}{@{}cccl@{}}
+    \toprule
+    \kode{i} & \kode{i == 3}? & Aksi & Output \\
+    \midrule
+    1, 2 & tidak & jalankan \kode{disp(i)} & \kode{1}, \kode{2} \\
+    3 & \alert{ya} & \alert{\kode{continue}} $\rightarrow$ \kode{disp} dilewati & -- \\
+    4, 5 & tidak & jalankan \kode{disp(i)} & \kode{4}, \kode{5} \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}[fragile]{Alur eksekusi \kode{continue}}
+  \centering
+  \begin{tikzpicture}[node distance=9mm and 14mm, >=Stealth]
+    \node[box] (start) {Iterasi ke-$i$};
+    \node[dec,right=of start] (cek) {\kode{i == 3}?};
+    \node[box,right=of cek] (proses) {Proses\\\kode{disp(i)}};
+    \node[box,below=of cek,fill=alertc!15] (cnt) {\kode{continue}};
+    \node[box,right=of proses] (after) {Selesai\\(\kode{i} habis)};
+    \draw[->] (start) -- (cek);
+    \draw[->] (cek) -- node[above,lbl]{tidak} (proses);
+    \draw[->] (cek) -- node[right,lbl]{ya} (cnt);
+    \draw[->] (cnt.west) -| node[below,pos=.25,lbl]{iterasi berikutnya} (start.south);
+    \draw[->] (proses.north) -- ++(0,6mm) -| node[above,pos=.25,lbl]{iterasi berikutnya} (start.north);
+    \draw[->,dashed] (proses) -- node[above,lbl]{iterasi terakhir} (after);
+  \end{tikzpicture}
+
+  \vspace{8pt}
+  \raggedright
+  Bandingkan dengan diagram \kode{break}: di sini jalur ``ya'' \alert{kembali ke kepala loop}.
+  Loop hanya selesai secara normal, yaitu ketika nilai \kode{i} sudah habis.
+\end{frame}
+
+\begin{frame}[fragile]{Jebakan: \kode{continue} di dalam \kode{while}}
+  \renewcommand{\codesize}{\scriptsize}
+  Pada \kode{for}, penghitung maju otomatis. Pada \kode{while}, \alert{Anda sendiri} yang menaikkan
+  penghitung, dan \kode{continue} bisa melompatinya.
+  \vspace{4pt}
+  \begin{columns}[T]
+    \begin{column}{0.47\textwidth}
+      \textcolor{alertc}{\textbf{Salah: loop tak berujung}}
+\begin{lstlisting}
+i = 0;
+while i < 5
+    if i == 2
+        continue;   % i tidak pernah naik!
+    end
+    disp(i)
+    i = i + 1;
+end
+\end{lstlisting}
+      \footnotesize
+      Output \kode{0}, \kode{1}, lalu program ``macet'': \kode{i} terus bernilai 2, kondisi \kode{i == 2} selalu
+      benar. Hentikan dengan \kode{Ctrl+C}.
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \textcolor{okc}{\textbf{Benar: naikkan penghitung lebih dulu}}
+\begin{lstlisting}
+i = 0;
+while i < 5
+    i = i + 1;      % selalu dijalankan
+    if i == 3
+        continue;
+    end
+    disp(i)
+end
+\end{lstlisting}
+      \footnotesize
+      Output \kode{1 2 4 5}. Penghitung diletakkan \alert{sebelum} \kode{continue}, sehingga tidak
+      pernah terlewati.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{\kode{break} vs \kode{continue}}
+  \centering
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    & \kode{break} & \kode{continue} \\
+    \midrule
+    Sisa badan loop pada iterasi ini & Dilewati & Dilewati \\
+    Iterasi berikutnya & \alert{Tidak ada} & Tetap dijalankan \\
+    Ke mana program melompat & Baris setelah \kode{end} & Kepala loop \\
+    Pertanyaan yang dijawab & ``Perlu lanjut?'' & ``Perlu proses yang ini?'' \\
+    Analogi berkas & Sudah ketemu, berhenti & Berkas kosong, sisihkan \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{12pt}
+  \begin{columns}[T]
+    \begin{column}{0.42\textwidth}
+      \centering
+      \textbf{break} di \kode{i == 3}, \kode{i = 1:5}\\[2pt]
+      \texttt{1 2 \alert{X}} \textcolor{black!40}{\texttt{(4 5 tidak dijalankan)}}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \centering
+      \textbf{continue} di \kode{i == 3}, \kode{i = 1:5}\\[2pt]
+      \texttt{1 2 \alert{-} 4 5}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================
+\section{Pause}
+
+\begin{frame}[fragile]{\kode{pause}: konsep}
+  \begin{block}{Definisi}
+    \kode{pause} menghentikan eksekusi program \alert{sementara}, lalu melanjutkannya dari baris berikutnya.
+    Tidak ada baris yang dilewati dan tidak ada iterasi yang hilang.
+  \end{block}
+  \vspace{4pt}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Berbeda dari \kode{break}/\kode{continue}}
+      \begin{itemize}
+        \item Tidak harus berada di dalam loop.
+        \item Tidak mengubah \alert{hasil} program, hanya \alert{kapan} baris berikutnya dijalankan.
+        \item Menghapus semua \kode{pause} dari program tidak mengubah output, hanya kecepatannya.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Kegunaan umum}
+      \begin{itemize}
+        \item Memberi waktu pengguna membaca hasil antara.
+        \item Membuat animasi grafik.
+        \item Memberi jeda antarlangkah saat demonstrasi atau \textit{debugging} sederhana.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Bentuk-bentuk \kode{pause}}
+  \centering
+  \small
+  \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.66\textwidth}@{}}
+    \toprule
+    Perintah & Efek \\
+    \midrule
+    \kode{pause(n)}     & Jeda $n$ detik, lalu lanjut otomatis. $n$ boleh pecahan, misalnya \kode{pause(0.5)}. \\
+    \kode{pause}        & Jeda sampai pengguna menekan tombol apa saja. \\
+    \kode{pause(0.05)}  & Jeda singkat; MATLAB sempat menggambar ulang grafik, sehingga sering dipakai untuk animasi. \\
+    \kode{pause('off')} & Menonaktifkan semua \kode{pause} berikutnya (berguna saat skrip dijalankan tanpa ditunggui). \\
+    \kode{pause('on')}  & Mengaktifkan kembali \kode{pause}. \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{8pt}
+  \normalsize
+  \raggedright
+  \begin{alertblock}{Tips}
+    Program yang sedang menunggu pada \kode{pause} (atau loop yang tidak berhenti) dapat dibatalkan dengan
+    \kode{Ctrl+C} di Command Window.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{\kode{pause(n)}: hitung mundur}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \labelkode
+\begin{lstlisting}
+for k = 3:-1:1
+    disp(k)
+    pause(1);     % tunggu 1 detik
+end
+disp('Mulai!')
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \labelout
+\begin{lstlisting}[style=out]
+3      (tunggu 1 dtk)
+2      (tunggu 1 dtk)
+1      (tunggu 1 dtk)
+Mulai!
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \vspace{8pt}
+  \begin{itemize}
+    \item Tanpa \kode{pause}, keempat baris muncul hampir bersamaan.
+    \item Dengan \kode{pause(1)}, output sama persis, tetapi muncul bertahap dalam kurang lebih 3 detik.
+    \item Ini menegaskan bahwa \kode{pause} mengatur \alert{waktu}, bukan \alert{alur}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Contoh pemakaian \kode{pause}}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Animasi sederhana}
+\begin{lstlisting}
+x = linspace(0, 2*pi, 100);
+for k = 1:100
+    plot(x(1:k), sin(x(1:k)));
+    xlim([0 2*pi]); ylim([-1 1]);
+    pause(0.05);   % jeda singkat
+end
+\end{lstlisting}
+      \vspace{2pt}
+      \footnotesize
+      Tanpa \kode{pause}, loop selesai sebelum grafik sempat ditampilkan; yang terlihat hanya gambar akhir.
+      Jika hanya perlu memperbarui grafik tanpa menunda, gunakan \kode{drawnow}.
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \textbf{Menunggu pengguna}
+\begin{lstlisting}
+disp('Hasil tahap 1 ...');
+disp('Tekan tombol apa saja')
+pause;
+disp('Lanjut ke tahap 2');
+\end{lstlisting}
+      \vspace{2pt}
+      \footnotesize
+      Program menunggu tanpa batas waktu. Cocok untuk skrip demonstrasi yang dijalankan bertahap.
+      Saat menjalankan skrip panjang tanpa ditunggui, tambahkan \kode{pause('off')} di awal agar
+      program tidak macet menunggu tombol.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================
+\section{Studi kasus: pembagian dengan nol}
+
+\begin{frame}[fragile]{Data uji: pembagian dengan 0}
+  Di MATLAB, \kode{x/0} tidak menghasilkan error, melainkan \kode{Inf} (dan \kode{0/0} menghasilkan \kode{NaN}).
+  Program jalan terus, sehingga masalah bisa lolos tanpa disadari.
+\begin{lstlisting}
+pembilang = [10 20 30 40 50 60];
+penyebut  = [ 2  5  0  4  0  3];
+\end{lstlisting}
+  \vspace{4pt}
+  \centering
+  \begin{tabular}{@{}lcccccc@{}}
+    \toprule
+    Data & 1 & 2 & 3 & 4 & 5 & 6 \\
+    \midrule
+    Hasil & 5 & 4 & \alert{Inf} & 10 & \alert{Inf} & 20 \\
+    Jenis & ganjil & genap & bermasalah & genap & bermasalah & genap \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{8pt}
+  \raggedright
+  \textbf{Aturan main:} (1) pembagi 0 adalah kondisi \alert{fatal}, proses harus dihentikan;
+  (2) hasil ganjil \alert{tidak perlu} dicetak, tetapi proses tetap lanjut.
+
+  \vspace{4pt}
+  Pertanyaan: aturan mana yang cocok dengan \kode{break}, dan mana yang cocok dengan \kode{continue}?
+\end{frame}
+
+\begin{frame}[fragile]{Versi 1: tanpa pengecekan}
+  \renewcommand{\codesize}{\scriptsize}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+\begin{lstlisting}
+for i = 1:length(pembilang)
+    hasil = pembilang(i) / penyebut(i);
+    fprintf('Data ke-%d: %d / %d = %g\n', ...
+        i, pembilang(i), penyebut(i), hasil);
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+\begin{lstlisting}[style=out]
+Data ke-1: 10 / 2 = 5
+Data ke-2: 20 / 5 = 4
+Data ke-3: 30 / 0 = Inf
+Data ke-4: 40 / 4 = 10
+Data ke-5: 50 / 0 = Inf
+Data ke-6: 60 / 3 = 20
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \vspace{6pt}
+  \begin{alertblock}{Masalah}
+    Semua dicetak, termasuk \kode{Inf} dan hasil ganjil. Tidak ada tanda bahwa ada yang salah.
+    Jika hasilnya dipakai di \kode{sum} atau rata-rata, hasil akhir ikut menjadi \kode{Inf}.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Versi 2: hanya \kode{break}}
+  \renewcommand{\codesize}{\scriptsize}
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
+\begin{lstlisting}
+for i = 1:length(pembilang)
+
+    if penyebut(i) == 0
+        fprintf('Data ke-%d: pembagi 0 -> STOP\n', i);
+        break;
+    end
+
+    hasil = pembilang(i) / penyebut(i);
+    fprintf('Data ke-%d: %d / %d = %d\n', ...
+        i, pembilang(i), penyebut(i), hasil);
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+\begin{lstlisting}[style=out]
+Data ke-1: 10 / 2 = 5
+Data ke-2: 20 / 5 = 4
+Data ke-3: pembagi 0 -> STOP
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \vspace{6pt}
+  \begin{exampleblock}{Hasil}
+    Pengecekan diletakkan \alert{sebelum} pembagian, sehingga \kode{Inf} tidak pernah terbentuk.
+    Loop berhenti tepat di data 3; data 4--6 tidak diproses. Namun data ganjil (data 1) masih dicetak,
+    karena aturan kedua belum diterapkan.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Versi 3: \kode{break} + \kode{continue}}
+  \renewcommand{\codesize}{\scriptsize}
+  \begin{columns}[T]
+    \begin{column}{0.6\textwidth}
+\begin{lstlisting}
+for i = 1:length(pembilang)
+
+    if penyebut(i) == 0
+        fprintf('Data ke-%d: pembagi 0 -> STOP\n', i);
+        break;        % aturan 1: berhenti total
+    end
+
+    hasil = pembilang(i) / penyebut(i);
+
+    if mod(hasil, 2) ~= 0
+        continue;     % aturan 2: ganjil, lewati
+    end
+
+    fprintf('Data ke-%d: %d / %d = %d\n', ...
+        i, pembilang(i), penyebut(i), hasil);
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.37\textwidth}
+\begin{lstlisting}[style=out]
+Data ke-2: 20 / 5 = 4
+Data ke-3: pembagi 0 -> STOP
+\end{lstlisting}
+      \vspace{4pt}
+      \footnotesize
+      \begin{itemize}
+        \item Data 1: hasil 5 ganjil $\rightarrow$ \kode{continue}.
+        \item Data 2: lolos kedua cek $\rightarrow$ dicetak.
+        \item Data 3: pembagi 0 $\rightarrow$ \kode{break}.
+        \item Data 4--6: tidak disentuh.
+      \end{itemize}
+      \vspace{2pt}
+      \alert{Urutan cek penting}: cek fatal (\kode{break}) diletakkan paling atas.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Rangkuman perbandingan}
+  \centering
+  \begin{tabular}{@{}clccc@{}}
+    \toprule
+    Data & Hasil & Tanpa cek & Hanya \kode{break} & \kode{break}+\kode{continue} \\
+    \midrule
+    1 & 5 (ganjil) & dicetak & dicetak & \alert{dilewati} \\
+    2 & 4          & dicetak & dicetak & dicetak \\
+    3 & Inf        & dicetak & \alert{STOP} & \alert{STOP} \\
+    4 & 10         & dicetak & tidak diproses & tidak diproses \\
+    5 & Inf        & dicetak & tidak diproses & tidak diproses \\
+    6 & 20         & dicetak & tidak diproses & tidak diproses \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{10pt}
+  \raggedright
+  \begin{itemize}
+    \item \kode{break} mengatur \alert{kapan loop berhenti}.
+    \item \kode{continue} mengatur \alert{iterasi mana yang dilewati}, tanpa menghentikan loop.
+    \item Tanpa keduanya, semua berjalan, termasuk \kode{Inf} yang lolos diam-diam.
+  \end{itemize}
+\end{frame}
+
+% =====================================================
+\section{Kapan dipakai?}
+
+\begin{frame}[fragile]{Panduan memilih}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Pakai \kode{break} jika \ldots}
+        \begin{itemize}
+          \item Target sudah ditemukan, sisanya tidak perlu dicek
+          \item Hasil sudah konvergen / toleransi tercapai
+          \item Muncul kondisi fatal (data rusak, pembagi 0)
+          \item Input pengguna sudah valid
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Pakai \kode{continue} jika \ldots}
+        \begin{itemize}
+          \item Hanya sebagian data yang tidak perlu diproses
+          \item Ada data kosong / \kode{NaN} yang harus dilewati
+          \item Ingin menghindari \kode{if} bersarang yang dalam
+          \item Menyaring data sebelum perhitungan utama
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{8pt}
+  \begin{alertblock}{Pertanyaan penuntun}
+    ``Jika kondisi ini terjadi, apakah data \alert{sesudahnya} masih perlu diproses?''
+    Jika tidak $\rightarrow$ \kode{break}. Jika ya $\rightarrow$ \kode{continue}.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Contoh 1: mencari elemen pertama \hfill\small(\kode{break})}
+  \renewcommand{\codesize}{\scriptsize}
+  \begin{columns}[T]
+    \begin{column}{0.6\textwidth}
+\begin{lstlisting}
+data = [4 8 15 16 23 42];
+idx  = 0;                % 0 = belum ketemu
+
+for i = 1:length(data)
+    if data(i) > 10
+        idx = i;
+        break;           % sudah ketemu
+    end
+end
+
+if idx > 0
+    fprintf('Pertama > 10: indeks %d (nilai %d)\n', ...
+        idx, data(idx));
+else
+    disp('Tidak ada elemen > 10');
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+\begin{lstlisting}[style=out]
+Pertama > 10: indeks 3 (nilai 15)
+\end{lstlisting}
+      \vspace{4pt}
+      \scriptsize
+      \begin{itemize}
+        \item Tanpa \kode{break}, loop tetap memeriksa \kode{16, 23, 42}, dan \kode{idx} tertimpa menjadi
+              \kode{6} (elemen \alert{terakhir} yang $>10$, bukan yang pertama).
+        \item Cabang \kode{else} menangani kasus tidak ada yang ditemukan; tanpa itu, \kode{data(0)}
+              akan menghasilkan error.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Contoh 2: iterasi sampai konvergen \hfill\small(\kode{break})}
+  \renewcommand{\codesize}{\scriptsize}
+  Menghitung $\sqrt{2}$ dengan metode Newton: $x_{\text{baru}} = \tfrac{1}{2}\left(x + \tfrac{2}{x}\right)$,
+  berhenti saat perubahan sudah sangat kecil.
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
+\begin{lstlisting}
+x = 1;
+for k = 1:100               % batas aman
+    xbaru = 0.5 * (x + 2/x);
+    if abs(xbaru - x) < 1e-6
+        fprintf('Iterasi %d: x = %.6f\n', ...
+            k, xbaru);
+        break;              % cukup, hentikan
+    end
+    x = xbaru;
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+\begin{lstlisting}[style=out]
+Iterasi 5: x = 1.414214
+\end{lstlisting}
+      \vspace{4pt}
+      \footnotesize
+      \begin{itemize}
+        \item Tanpa \kode{break}, 95 iterasi sisanya terbuang percuma.
+        \item Batas \kode{1:100} adalah ``pengaman'': jika metode tidak pernah konvergen, loop tetap
+              berhenti. Pola ini umum di metode numerik.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Contoh 3: melewati data kosong \hfill\small(\kode{continue})}
+  \renewcommand{\codesize}{\scriptsize}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+\begin{lstlisting}
+data  = [3 NaN 5 NaN 2];
+total = 0;
+n     = 0;
+
+for i = 1:length(data)
+    if isnan(data(i))
+        continue;   % lewati data kosong
+    end
+    total = total + data(i);
+    n     = n + 1;
+end
+
+fprintf('Rata-rata = %.2f (%d data valid)\n', ...
+    total/n, n);
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+\begin{lstlisting}[style=out]
+Rata-rata = 3.33 (3 data valid)
+\end{lstlisting}
+      \vspace{4pt}
+      \footnotesize
+      \begin{itemize}
+        \item Tanpa pengecekan, satu \kode{NaN} saja membuat \kode{total} menjadi \kode{NaN}.
+        \item \kode{continue} juga melewati \kode{n = n + 1}, sehingga pembagi rata-rata hanya menghitung
+              data valid.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Contoh 4: validasi input \hfill\small(\kode{while} + \kode{break})}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+\begin{lstlisting}
+while true
+    umur = input('Masukkan umur: ');
+
+    if isscalar(umur) && umur > 0
+        break;          % valid, keluar
+    end
+
+    disp('Tidak valid, coba lagi.');
+end
+fprintf('Umur dicatat: %d\n', umur);
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+\begin{lstlisting}[style=out]
+Masukkan umur: -3
+Tidak valid, coba lagi.
+Masukkan umur: 20
+Umur dicatat: 20
+\end{lstlisting}
+      \vspace{4pt}
+      \footnotesize
+      \begin{itemize}
+        \item Jumlah percobaan tidak diketahui di awal, sehingga \kode{while true} + \kode{break} cocok.
+        \item \kode{isscalar} menolak input kosong (hanya menekan Enter) maupun vektor.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Kapan sebaiknya \alert{tidak} dipakai}
+  \renewcommand{\codesize}{\scriptsize}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{1. Ada cara vektor yang lebih ringkas.}\\
+      Contoh 1 dan 3 tanpa loop sama sekali:
+\begin{lstlisting}
+idx  = find(data > 10, 1);       % Contoh 1
+rata = mean(data(~isnan(data))); % Contoh 3
+\end{lstlisting}
+      \vspace{6pt}
+      \textbf{2. Kondisi berhenti bisa ditulis di \kode{while}.}\\
+      Contoh 2 tanpa \kode{break}:
+\begin{lstlisting}
+x = 1;  xbaru = 1.5;  k = 1;
+while abs(xbaru - x) >= 1e-6 && k < 100
+    x     = xbaru;
+    xbaru = 0.5 * (x + 2/x);
+    k     = k + 1;
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{3. Terlalu banyak \kode{break}/\kode{continue}.}\\
+      \small Satu loop dengan banyak titik keluar sulit dilacak. Satu atau dua titik keluar dengan
+      komentar yang jelas biasanya masih wajar.
+      \vspace{8pt}
+
+      \textbf{4. Butuh keluar dari beberapa loop.}\\
+      \small \kode{break} hanya memengaruhi loop terdalam. Gunakan penanda (\textit{flag}), atau
+      bungkus loop dalam fungsi dan pakai \kode{return}.
+      \vspace{8pt}
+
+      \begin{exampleblock}{Prinsip}
+        Pilih bentuk yang paling mudah \alert{dibaca}. \kode{break} dan \kode{continue} adalah alat,
+        bukan kewajiban.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================
+\section{Latihan}
+
+\begin{frame}[fragile]{Latihan: tebak output-nya}
+  \renewcommand{\codesize}{\scriptsize}
+  Telusuri setiap kode \alert{tanpa menjalankannya}, lalu tuliskan output-nya.
+  \vspace{4pt}
+  \begin{columns}[T]
+    \begin{column}{0.29\textwidth}
+      \textbf{Soal 1}
+\begin{lstlisting}
+for k = 1:6
+    if mod(k,3) == 0
+        continue;
+    end
+    fprintf('%d ', k);
+end
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \textbf{Soal 2}
+\begin{lstlisting}
+s = 0;
+for k = 1:10
+    s = s + k;
+    if s >= 15
+        break;
+    end
+end
+fprintf('k=%d s=%d', k, s);
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.37\textwidth}
+      \textbf{Soal 3}
+\begin{lstlisting}
+for i = 1:3
+    for j = 1:3
+        if j == i
+            continue;
+        end
+        fprintf('(%d,%d) ', i, j);
+    end
+end
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \vspace{8pt}
+  \textbf{Soal 4.} Diberikan \kode{data = [4 NaN 7 2 -1 5]}. Tulis loop yang menjumlahkan data, dengan
+  aturan: lewati \kode{NaN}, dan hentikan penjumlahan begitu bertemu bilangan negatif.
+  Berapa hasilnya?
+\end{frame}
+
+\begin{frame}[fragile]{Kunci jawaban}
+  \renewcommand{\codesize}{\scriptsize}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Soal 1:} \kode{1 2 4 5}\\
+      \footnotesize \kode{k = 3} dan \kode{k = 6} habis dibagi 3, sehingga dilewati.
+      \vspace{6pt}
+
+      \normalsize\textbf{Soal 2:} \kode{k=5 s=15}\\
+      \footnotesize Penelusuran \kode{s}: 1, 3, 6, 10, \alert{15}. Nilai \kode{k} saat \kode{break}
+      tetap tersimpan.
+      \vspace{6pt}
+
+      \normalsize\textbf{Soal 3:} \kode{(1,2) (1,3) (2,1) (2,3) (3,1) (3,2)}\\
+      \footnotesize Pasangan dengan \kode{i == j} dilewati; \kode{continue} hanya memengaruhi loop \kode{j}.
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Soal 4:} \kode{total = 13}
+\begin{lstlisting}
+data  = [4 NaN 7 2 -1 5];
+total = 0;
+for i = 1:length(data)
+    if isnan(data(i))
+        continue;     % lewati NaN
+    end
+    if data(i) < 0
+        break;        % berhenti di negatif
+    end
+    total = total + data(i);
+end
+disp(total)           % 4 + 7 + 2 = 13
+\end{lstlisting}
+      \footnotesize Angka \kode{5} di akhir tidak ikut dijumlah karena loop sudah berhenti di \kode{-1}.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================
+\section{Ringkasan}
+
+\begin{frame}[fragile]{Ringkasan}
+  \centering
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    Perintah & Efek & Lompat ke & Contoh pemakaian \\
+    \midrule
+    \kode{break}    & Keluar dari loop     & Baris setelah \kode{end} & Target ketemu, konvergen, data fatal \\
+    \kode{continue} & Lewati iterasi ini   & Kepala loop             & Data \kode{NaN}, data yang disaring \\
+    \kode{pause}    & Jeda sementara       & Baris berikutnya        & Animasi, menunggu pengguna \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{12pt}
+  \raggedright
+  \begin{itemize}
+    \item \kode{break} dan \kode{continue} hanya berlaku di dalam loop, dan hanya pada loop yang paling dalam.
+          Untuk keluar dari beberapa loop, gunakan penanda atau \kode{return}.
+    \item \kode{break} keluar dari \alert{loop}, bukan dari \kode{if} yang membungkusnya.
+    \item Pada \kode{while}, pastikan penghitung tidak terlewati oleh \kode{continue}.
+    \item \kode{pause} tidak mengubah alur loop, hanya menunda eksekusi.
+    \item Tulis kondisi pengecekan yang jelas agar masalah seperti \kode{Inf} dan \kode{NaN} tidak lolos diam-diam.
+  \end{itemize}
+\end{frame}
+
+\end{document}
